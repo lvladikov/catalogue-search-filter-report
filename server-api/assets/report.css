@@ -1,0 +1,293 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #fff;
+  margin: 0;
+  padding: 0;
+}
+.container {
+  width: 90%;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  text-align: center;
+}
+.hidden {
+  display: none !important;
+}
+input,
+select,
+textarea {
+  color: #fff;
+  background-color: #1e2129;
+  border-color: #666;
+  border-radius: 3px;
+  transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+}
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+input {
+  line-height: normal;
+}
+label {
+  font-weight: 400;
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: 0.31em;
+}
+button.text-like-button {
+  border: none;
+  background: none;
+  padding: 0 3px;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  font-style: italic;
+}
+
+.observation-display-containers-wrapper {
+  font-size: 14px;
+  font-family: "Lato", sans-serif;
+  margin-top: 15px;
+  border: 1px solid #acb7cc;
+  border-radius: 10px;
+  padding: 20px;
+  background-color: #363643;
+  color: #fff;
+  text-align: left;
+  width: calc(100% - 110px);
+  margin: 0 auto 2px;
+}
+
+.observation-display-container {
+  display: inline-block;
+  margin: 0 -15px 20px;
+  width: 33%;
+  min-width: 385px;
+  max-height: 1225px;
+  overflow: hidden;
+  background-color: #363643;
+}
+
+.obs-view.obs-view-bordered {
+  min-height: 1035px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid #646469;
+  padding: 1.25em;
+  margin: 0 0.5em;
+}
+
+.obs-view__header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+}
+.obs-view__header .obs-view-badge,
+.obs-view__header .obs-view-title {
+  font-family: Monark-regular, sans-serif;
+  font-weight: 400;
+  font-size: 1em;
+  line-height: 17px;
+  text-transform: uppercase;
+  color: #fafafb;
+}
+
+.obs-view__header .obs-view-badge em,
+.obs-view__header .obs-view-title em {
+  color: #717d9a;
+  margin-right: 3px;
+  position: relative;
+  top: -1px;
+}
+
+.my-obs-title-elm-filter {
+  margin-left: 10px;
+}
+
+.obs-view.obs-view-bordered .obs-view__image {
+  position: relative;
+  width: 100%;
+  height: 0;
+  overflow: hidden;
+  padding-bottom: 100%;
+}
+
+.obs-view__image {
+  position: relative;
+  width: 100%;
+  height: 0;
+  overflow: hidden;
+  padding-bottom: 76%;
+  margin: 1em 0;
+}
+.obs-view.obs-view-bordered .obs-view__image .aspect-ratio-img {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(115, 116, 121, 0.1);
+}
+.obs-view__image .aspect-ratio-img {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(115, 116, 121, 0.1);
+}
+.obs-view.obs-view-bordered .obs-view__image img {
+  width: 100%;
+  border: 2px solid grey;
+}
+
+.obs-view.obs-view-bordered .obs-view__image.image-not-cached {
+  border: 2px outset #ff00003d;
+}
+
+.obs-view__image .aspect-ratio-img img {
+  width: 100%;
+  transform: scale(1);
+  transition: 0.7s;
+}
+
+.obs-view__info .obs-view-list .list-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 0.31em 0;
+}
+.obs-view__info .obs-view-list .list-item span:first-child {
+  font-family: Rubik, sans-serif;
+  font-weight: 300;
+  font-size: 11px;
+  line-height: 1;
+  color: #8b8e95;
+  white-space: nowrap;
+  padding-right: 5px;
+}
+.obs-view__info .obs-view-list .list-item .dotted-space {
+  border-bottom: 2px dotted #36363b;
+  flex: 1;
+}
+.obs-view__info .obs-view-list .list-item.list-item--observed-on em {
+  font-size: 8px;
+}
+
+.obs-view__info
+  .obs-view-list
+  .list-item.list-item--observed-on
+  span.observed-on-text {
+  min-height: 85px;
+}
+
+.obs-view__info .obs-view-list .list-item--files-folders {
+  display: block;
+  height: 170px;
+  overflow: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.obs-view__info .obs-view-list .list-item--files-folders pre {
+  font-size: 10px;
+  color: #fafafb;
+  text-align: left;
+  overflow: scroll; /* Ensure scrolling is still possible */
+  -ms-overflow-style: none; /* Hide scrollbar in IE/Edge */
+  scrollbar-width: none; /* Hide scrollbar in Firefox */
+}
+
+.obs-view__info
+  .obs-view-list
+  .list-item--files-folders
+  pre::-webkit-scrollbar-track {
+  background: #f0f0f0; /* Light gray background */
+}
+
+.observation-display-container--data--obs-details
+  .obs-view__info
+  .obs-view-list
+  .list-item
+  span:last-child {
+  text-align: right;
+}
+
+.obs-view__info .obs-view-list .list-item span:last-child {
+  font-family: Arial, sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  color: #fafafb;
+}
+
+@media only screen and (min-width: 1200px) {
+  .obs-view__info .obs-view-list .list-item--files-folders {
+    height: 330px;
+  }
+}
+
+@media only screen and (min-width: 1500px) {
+  .obs-view__info .obs-view-list .list-item--files-folders {
+    height: 300px;
+  }
+}
+
+@media only screen and (min-width: 1650px) {
+  .obs-view__info .obs-view-list .list-item--files-folders {
+    height: 280px;
+  }
+}
+
+@media only screen and (min-width: 1700px) {
+  .obs-view__info .obs-view-list .list-item--files-folders {
+    height: 260px;
+  }
+}
+
+@media only screen and (min-width: 1800px) {
+  .obs-view__info .obs-view-list .list-item--files-folders {
+    height: 240px;
+  }
+}
+
+@media only screen and (min-width: 1900px) {
+  .obs-view__info .obs-view-list .list-item--files-folders {
+    height: 210px;
+  }
+}
+
+@media only screen and (min-width: 2000px) {
+  .obs-view__info .obs-view-list .list-item--files-folders {
+    height: 180px;
+  }
+}
+
+@media only screen and (min-width: 2150px) {
+  .obs-view__info .obs-view-list .list-item--files-folders {
+    height: 150px;
+  }
+}
+
+@media only print {
+  img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+
+  .observation-display-container:nth-child(odd):not(:first-child):not(
+      :last-child
+    ) {
+    break-after: page;
+    page-break-before: always;
+    margin-top: 20px;
+  }
+
+  .generate-pdf-report-wrapper {
+    display: none;
+  }
+}

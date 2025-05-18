@@ -1,0 +1,28 @@
+node_modules
+
+# Ignore everything in image-cache/ (with exceptions, see below)
+image-cache/*
+
+# Allow specific images - this is to demonstrate working image cache behaviour with first 10 images precached
+# This would also match in the server-api/image-cache.json
+# the rest would be downloaded on the fly as part of the main app caching behaviour
+!image-cache/Demo-Image-0001.jpg
+!image-cache/Demo-Image-0002.jpg
+!image-cache/Demo-Image-0003.jpg
+!image-cache/Demo-Image-0004.jpg
+!image-cache/Demo-Image-0005.jpg
+!image-cache/Demo-Image-0006.jpg
+!image-cache/Demo-Image-0007.jpg
+!image-cache/Demo-Image-0008.jpg
+!image-cache/Demo-Image-0009.jpg
+!image-cache/Demo-Image-0010.jpg
+
+# Ignore for now most of the 772 demo-folders, but the top ones (I might provide a script that can generate dummy structure based on data/demo-data.json)
+demo-folders/*
+
+# Allow specific demo-folders
+!demo-folders/DEMO-FOLDER-Subject-0001
+!demo-folders/DEMO-FOLDER-Subject-0002
+!demo-folders/DEMO-FOLDER-Subject-0003
+!demo-folders/DEMO-FOLDER-Subject-0004
+!demo-folders/DEMO-FOLDER-Subject-0005
