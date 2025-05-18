@@ -85,7 +85,7 @@ app.get("/generate-pdf-report-trigger", async (req, res) => {
     pdfJobs[id] = {
       pdfReadyStatus: true,
       pdfFileName: pdfFileName,
-      pdfResult: resultArray.slice(0, 100),
+      pdfResult: resultArray.slice(0, 100), //For easy view of a minimal data extract in the API response
     };
 
     console.log(`PDF Response given...`);
