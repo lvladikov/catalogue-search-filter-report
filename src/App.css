@@ -158,7 +158,6 @@ label {
   margin: 0 -6px 20px 10px;
   width: 33%;
   min-width: 385px;
-  max-height: 1225px;
   overflow: hidden;
   background-color: #363643;
 }
@@ -279,9 +278,13 @@ label {
   min-height: 85px;
 }
 
+.obs-view__info .obs-view-list .list-item.list-item--summary span.summary-text {
+  min-height: 125px;
+}
+
 .obs-view__info .obs-view-list .list-item--files-folders {
   display: block;
-  height: 170px;
+  height: 130px;
   overflow: scroll;
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -330,15 +333,22 @@ label {
   }
 }
 
-@media only screen and (max-width: 1200px) {
+@media only screen and (max-width: 905px) {
+  .obs-view__info
+    .obs-view-list
+    .list-item.list-item--summary
+    span.summary-text {
+    min-height: initial;
+  }
+
   .observation-display-filters-breaker {
     display: block;
   }
 }
 
-@media only screen and (min-width: 1200px) {
-  .obs-view__info .obs-view-list .list-item--files-folders {
-    height: 330px;
+@media only screen and (min-width: 905px) {
+  .obs-view.obs-view-bordered {
+    min-height: 1160px;
   }
 }
 
@@ -349,48 +359,8 @@ label {
 }
 
 @media only screen and (min-width: 1500px) {
-  .obs-view__info .obs-view-list .list-item--files-folders {
-    height: 300px;
-  }
-
   .observation-display-container {
     width: calc(25% - 8px);
-  }
-}
-
-@media only screen and (min-width: 1650px) {
-  .obs-view__info .obs-view-list .list-item--files-folders {
-    height: 280px;
-  }
-}
-
-@media only screen and (min-width: 1700px) {
-  .obs-view__info .obs-view-list .list-item--files-folders {
-    height: 260px;
-  }
-}
-
-@media only screen and (min-width: 1800px) {
-  .obs-view__info .obs-view-list .list-item--files-folders {
-    height: 240px;
-  }
-}
-
-@media only screen and (min-width: 1900px) {
-  .obs-view__info .obs-view-list .list-item--files-folders {
-    height: 210px;
-  }
-}
-
-@media only screen and (min-width: 2000px) {
-  .obs-view__info .obs-view-list .list-item--files-folders {
-    height: 180px;
-  }
-}
-
-@media only screen and (min-width: 2150px) {
-  .obs-view__info .obs-view-list .list-item--files-folders {
-    height: 150px;
   }
 }
 

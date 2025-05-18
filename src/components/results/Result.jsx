@@ -146,7 +146,7 @@ export default function Result({
                   <span>Summary</span>
                   <span className="dotted-space"></span>
                   <span className="summary-text" data-full-text={summary}>
-                    {trimText(summary, 750)}
+                    {trimText(summary, 550)}
                   </span>
                 </li>
                 <li className="list-item list-item--files-folders">
