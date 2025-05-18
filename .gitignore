@@ -16,6 +16,7 @@ image-cache/*
 !image-cache/Demo-Image-0008.jpg
 !image-cache/Demo-Image-0009.jpg
 !image-cache/Demo-Image-0010.jpg
+!image-cache/README.md
 
 # Ignore for now most of the 772 demo-folders, but the top ones
 demo-folders/*
