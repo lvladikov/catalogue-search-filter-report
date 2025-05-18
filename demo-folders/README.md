@@ -1,4 +1,4 @@
-# NOTE About this folder
+# About this folder
 
 ## demo-folders
 

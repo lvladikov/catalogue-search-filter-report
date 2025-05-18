@@ -1,6 +1,6 @@
-# NOTE About this folder
+# About this folder
 
-## Server
+## server-api
 
 This folder runs separately from the Client app environment and provides additional Node JS functionality and API endpoints for the React app to use!
 
