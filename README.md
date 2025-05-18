@@ -6,7 +6,7 @@
 
 This project was created as a coding fun and exercise, although it has a very practical purpose for me as well. I have been collecting over time large sets of metadata around astronomical observations, such as targets, coordinates, telescopes, time of observation, filters used, folders where I've kept and organised my files, as well as description of the targets and a lot more meta items for each of the thousands of observations. Since I have been automating the process of collecting that data (thanks to other of my coding projects for sideloading scripts locally, for me only, alongside live websites that I use), I ended up with large JSON file that stores the described metadata.
 
-I created this project to solve a number of problems - mainly to be able to load up that large JSON file with metadata into a purposely built React application that can filter and sort the data based on number of UI selectable filters, and display subsets of that data in a managable way in the browser.
+I created this project to solve a number of problems - mainly to be able to load up that large JSON file with metadata into a purposely built React application that can filter and sort the data based on number of UI selectable filters, and display subsets of that data in a manageable way in the browser.
 
 ![General Look and Feel](./screenshots/general-look.jpg)
 
