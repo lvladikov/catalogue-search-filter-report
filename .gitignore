@@ -17,7 +17,7 @@ image-cache/*
 !image-cache/Demo-Image-0009.jpg
 !image-cache/Demo-Image-0010.jpg
 
-# Ignore for now most of the 772 demo-folders, but the top ones (I might provide a script that can generate dummy structure based on data/demo-data.json)
+# Ignore for now most of the 772 demo-folders, but the top ones
 demo-folders/*
 
 # Allow specific demo-folders
@@ -26,3 +26,5 @@ demo-folders/*
 !demo-folders/DEMO-FOLDER-Subject-0003
 !demo-folders/DEMO-FOLDER-Subject-0004
 !demo-folders/DEMO-FOLDER-Subject-0005
+!demo-folders/generate-demo-folders.js
+!demo-folders/README.md

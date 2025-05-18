@@ -76,6 +76,12 @@ This would be the folder where the locally stored images would be cached.
 
 This is where your metadata JSON file that the App uses both in Client and Server **should be** placed. In the client app you point the browser to this folder and file, and due to browser security restrictions I can only pass the filename to the server and not the full file path, hence the Server is preconfigured to look into this folder for whichever dynamic filename is open by the Client. I did consider at one time to POST the whole content of the file to the Server so there is no need to know where to look, folder wise, but since we're talking about lots of MB of data (in my case), passing just the name reference seemed like the better approach.
 
+### demo-folders/
+
+This is where the server app looks into for matching observations and generating lists of files and folders.
+
+This folder is a simplified and simulated version of my observations folder where I keep all files and subfolders for every observation. The Client app and the Server app generate dynamically list of files and folders for each observation as part of the reporting. I've provided a script (`generate-demo-folders.js`) in that folder that can generate dummy folders and files structure for every observation listed in the provided data/demo-data.json.
+
 ## Final notes
 
 ### App setup
