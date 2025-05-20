@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useReducer, useRef } from "react";
 
 import CommonSelect from "../common/CommonSelect";
 import CommonInput from "../common/CommonInput";
@@ -20,9 +20,10 @@ import {
 } from "../../utils/date-and-time";
 import { getFilteredData } from "../../utils/filter";
 
+// Initial Constants for Filter State
 const filterByTextTypeOptionInitial = filterByTextTypeOptions[0].value;
 const filterByTextInitial = "";
-const filterExactOrPartialInitial = "P";
+const filterExactOrPartialInitial = "P"; // 'P' for Partial, 'E' for Exact
 
 const monthInitial = months[0].value;
 const yearInitial = years[0].value;
@@ -31,7 +32,7 @@ const dayOfTheWeekInitial = daysOfTheWeek[0].value;
 const telescopeInitial = telescopes[0].value;
 
 const filterSortByTextTypeInitial = filterSortByTextTypeOptions[0].value;
-const filterSortByDescOrAscInitial = "D";
+const filterSortByDescOrAscInitial = "D"; // 'D' for Descending, 'A' for Ascending
 
 const filterStartAtInitial = 1;
 const filterLimitInitial = 20;
@@ -40,6 +41,106 @@ const obsMatchedInitial = 0;
 const obsTotalInitial = 0;
 const obsShowingHowManyInitial = filterLimitInitial;
 
+// Action Types for useReducer
+const ACTIONS = {
+  SET_FILTER_BY_TEXT_TYPE: "SET_FILTER_BY_TEXT_TYPE",
+  SET_FILTER_BY_TEXT: "SET_FILTER_BY_TEXT",
+  TOGGLE_FILTER_EXACT_OR_PARTIAL: "TOGGLE_FILTER_EXACT_OR_PARTIAL",
+  SET_SELECTED_MONTH: "SET_SELECTED_MONTH",
+  SET_SELECTED_YEAR: "SET_SELECTED_YEAR",
+  SET_SELECTED_DAY_OF_THE_WEEK: "SET_SELECTED_DAY_OF_THE_WEEK",
+  SET_SELECTED_TELESCOPE: "SET_SELECTED_TELESCOPE",
+  TOGGLE_FILTER_SORT_BY_DESC_OR_ASC: "TOGGLE_FILTER_SORT_BY_DESC_OR_ASC",
+  SET_FILTER_SORT_BY_TEXT_TYPE: "SET_FILTER_SORT_BY_TEXT_TYPE",
+  SET_FILTER_START_AT: "SET_FILTER_START_AT",
+  SET_FILTER_LIMIT: "SET_FILTER_LIMIT",
+  SET_OBS_MATCHED: "SET_OBS_MATCHED",
+  SET_OBS_TOTAL: "SET_OBS_TOTAL",
+  SET_OBS_SHOWING_HOW_MANY: "SET_OBS_SHOWING_HOW_MANY",
+  SET_FILTER_LIMIT_FOR_RESULT_SUMMARY: "SET_FILTER_LIMIT_FOR_RESULT_SUMMARY",
+  RESET_FILTERS: "RESET_FILTERS",
+  INITIALIZE_DATE_FILTERS: "INITIALIZE_DATE_FILTERS",
+};
+
+// Initial State Object
+const initialState = {
+  filterByTextType: filterByTextTypeOptionInitial,
+  filterByText: filterByTextInitial,
+  filterExactOrPartial: filterExactOrPartialInitial,
+  selectedMonth: monthInitial,
+  selectedYear: yearInitial,
+  selectedDayOfTheWeek: dayOfTheWeekInitial,
+  selectedTelescope: telescopeInitial,
+  filterSortByDescOrAsc: filterSortByDescOrAscInitial,
+  filterSortByTextType: filterSortByTextTypeInitial,
+  filterStartAt: filterStartAtInitial,
+  filterLimit: filterLimitInitial,
+  filterLimitForResultSummary: filterLimitInitial, // will only get updated after the filter form is submitted
+  obsMatched: obsMatchedInitial,
+  obsTotal: obsTotalInitial,
+  obsShowingHowMany: obsShowingHowManyInitial,
+};
+
+function filterReducer(state, action) {
+  switch (action.type) {
+    case ACTIONS.SET_FILTER_BY_TEXT_TYPE:
+      return { ...state, filterByTextType: action.payload };
+    case ACTIONS.SET_FILTER_BY_TEXT:
+      return { ...state, filterByText: action.payload };
+    case ACTIONS.TOGGLE_FILTER_EXACT_OR_PARTIAL:
+      return {
+        ...state,
+        filterExactOrPartial:
+          state.filterExactOrPartial === filterExactOrPartialInitial
+            ? "E"
+            : filterExactOrPartialInitial,
+      };
+    case ACTIONS.SET_SELECTED_MONTH:
+      return { ...state, selectedMonth: action.payload };
+    case ACTIONS.SET_SELECTED_YEAR:
+      return { ...state, selectedYear: action.payload };
+    case ACTIONS.SET_SELECTED_DAY_OF_THE_WEEK:
+      return { ...state, selectedDayOfTheWeek: action.payload };
+    case ACTIONS.SET_SELECTED_TELESCOPE:
+      return { ...state, selectedTelescope: action.payload };
+    case ACTIONS.TOGGLE_FILTER_SORT_BY_DESC_OR_ASC:
+      return {
+        ...state,
+        filterSortByDescOrAsc:
+          state.filterSortByDescOrAsc === filterSortByDescOrAscInitial
+            ? "A"
+            : filterSortByDescOrAscInitial,
+      };
+    case ACTIONS.SET_FILTER_SORT_BY_TEXT_TYPE:
+      return { ...state, filterSortByTextType: action.payload };
+    case ACTIONS.SET_FILTER_START_AT:
+      return { ...state, filterStartAt: action.payload };
+    case ACTIONS.SET_FILTER_LIMIT:
+      return { ...state, filterLimit: action.payload };
+    case ACTIONS.SET_OBS_MATCHED:
+      return { ...state, obsMatched: action.payload };
+    case ACTIONS.SET_OBS_TOTAL:
+      return { ...state, obsTotal: action.payload };
+    case ACTIONS.SET_OBS_SHOWING_HOW_MANY:
+      return { ...state, obsShowingHowMany: action.payload };
+    case ACTIONS.SET_FILTER_LIMIT_FOR_RESULT_SUMMARY:
+      return { ...state, filterLimitForResultSummary: action.payload };
+    case ACTIONS.RESET_FILTERS:
+      // Reset all filter states to their initial values.
+      return initialState;
+    case ACTIONS.INITIALIZE_DATE_FILTERS:
+      // Action to initialize month and year from useEffect.
+      return {
+        ...state,
+        selectedMonth: action.payload.month,
+        selectedYear: action.payload.year,
+      };
+    default:
+      // If an unknown action is dispatched, return the current state unchanged.
+      return state;
+  }
+}
+
 export default function Filter({
   data,
   onUpdateFilters,
@@ -47,58 +148,38 @@ export default function Filter({
   loading,
   onShowLoading,
 }) {
-  //these two will be used for focus on the respective inputs,
-  //triggered from outside their containing form
+  const [state, dispatch] = useReducer(filterReducer, initialState);
+
+  // Destructure state properties for easier access in JSX and handlers.
+  const {
+    filterByTextType,
+    filterByText,
+    filterExactOrPartial,
+    selectedMonth,
+    selectedYear,
+    selectedDayOfTheWeek,
+    selectedTelescope,
+    filterSortByDescOrAsc,
+    filterSortByTextType,
+    filterStartAt,
+    filterLimit,
+    filterLimitForResultSummary,
+    obsMatched,
+    obsTotal,
+    obsShowingHowMany,
+  } = state;
+
+  // These two refs will be used for focus on the respective inputs,
+  // triggered from outside their containing form.
   const obsDisplayFilterLimitRef = useRef(null);
   const obsDisplayFilterStartAtRef = useRef(null);
 
-  const [filterByTextType, setFilterByTextType] = useState(
-    filterByTextTypeOptionInitial
-  );
-  const [filterByText, setFilterByText] = useState(filterByTextInitial);
-  const [filterExactOrPartial, setFilterExactOrPartial] = useState(
-    filterExactOrPartialInitial
-  );
-
-  const [selectedMonth, setSelectedMonth] = useState(monthInitial);
-  const [selectedYear, setSelectedYear] = useState(yearInitial);
-  const [selectedDayOfTheWeek, setSelectedDayOfTheWeek] =
-    useState(dayOfTheWeekInitial);
-
-  const [selectedTelescope, setSelectedTelescope] = useState(telescopeInitial);
-
-  const [filterSortByDescOrAsc, setFilterSortByDescOrAsc] = useState(
-    filterSortByDescOrAscInitial
-  );
-  const [filterSortByTextType, setFilterSortByTextType] = useState(
-    filterSortByTextTypeInitial
-  );
-
-  const [filterStartAt, setFilterStartAt] = useState(filterStartAtInitial);
-  const [filterLimit, setFilterLimit] = useState(filterLimitInitial);
-  const [filterLimitForResultSummary, setFilterLimitForResultSummary] =
-    useState(filterLimitInitial); //will only get updated after the filter form is submitted
-
-  const [obsMatched, setObsMatched] = useState(obsMatchedInitial);
-  const [obsTotal, setObsTotal] = useState(obsTotalInitial);
-  const [obsShowingHowMany, setObsShowingHowMany] = useState(
-    obsShowingHowManyInitial
-  );
-
   const handleFilterExactOrPartial = () => {
-    setFilterExactOrPartial((previousFilterExactOrPartial) =>
-      previousFilterExactOrPartial === filterExactOrPartialInitial
-        ? "E"
-        : filterExactOrPartialInitial
-    );
+    dispatch({ type: ACTIONS.TOGGLE_FILTER_EXACT_OR_PARTIAL });
   };
 
   const handleFilterSortByDescOrAsc = () => {
-    setFilterSortByDescOrAsc((previousFilterSortByDescOrAsc) =>
-      previousFilterSortByDescOrAsc === filterSortByDescOrAscInitial
-        ? "A"
-        : filterSortByDescOrAscInitial
-    );
+    dispatch({ type: ACTIONS.TOGGLE_FILTER_SORT_BY_DESC_OR_ASC });
   };
 
   const handleFilterFormSubmit = (e) => {
@@ -171,66 +252,55 @@ or start the caching server and reload the app!
         selectedDayOfTheWeek,
         filterStartAt,
         filterLimit,
-        setObsMatched,
+        setObsMatched: (value) =>
+          dispatch({ type: ACTIONS.SET_OBS_MATCHED, payload: value }),
       });
 
       onUpdateFilters(filteredData);
 
       // Note that the `onShowLoading(false)` will be handled in Results.jsx after it's done the additional processing
 
-      setObsShowingHowMany(filteredData.length);
-      setObsTotal(data?.length);
+      // Update result summary related states.
+      dispatch({
+        type: ACTIONS.SET_OBS_SHOWING_HOW_MANY,
+        payload: filteredData.length,
+      });
+      dispatch({ type: ACTIONS.SET_OBS_TOTAL, payload: data?.length });
 
-      //keeping this as separate state so that changes made to the filterLimit only
-      //udpates/rerenders FilterResultSummary after the form has been resubmitted and not on every keystroke
-      setFilterLimitForResultSummary(filterLimit);
+      // keeping this as separate state so that changes made to the filterLimit only
+      // updates/rerenders FilterResultSummary after the form has been resubmitted and not on every keystroke
+      dispatch({
+        type: ACTIONS.SET_FILTER_LIMIT_FOR_RESULT_SUMMARY,
+        payload: filterLimit,
+      });
     }, 0);
   };
 
   const handleReset = () => {
-    setFilterByTextType(filterByTextTypeOptionInitial);
-    setFilterByText(filterByTextInitial);
-    setFilterExactOrPartial(filterExactOrPartialInitial);
-
-    setSelectedMonth(monthInitial);
-    setSelectedYear(yearInitial);
-    setSelectedDayOfTheWeek(dayOfTheWeekInitial);
-
-    setSelectedTelescope(telescopeInitial);
-
-    setFilterSortByTextType(filterSortByTextTypeInitial);
-    setFilterSortByDescOrAsc(filterSortByDescOrAscInitial);
-
-    setFilterStartAt(filterStartAtInitial);
-    setFilterLimit(filterLimitInitial);
-
-    setObsMatched(obsMatchedInitial);
-    setObsTotal(obsTotalInitial);
-    setObsShowingHowMany(obsShowingHowManyInitial);
-
+    dispatch({ type: ACTIONS.RESET_FILTERS });
     onUpdateFilters(null);
   };
 
-  const handleFilterLimitsCommonChange = (e, stateSetFn) => {
+  const handleFilterLimitsCommonChange = (e, actionType) => {
     const targetValue = e.target.value;
     const targetValueInt = parseInt(targetValue);
 
     if (!Number.isNaN(targetValueInt) && targetValueInt >= 0) {
-      stateSetFn(targetValueInt);
+      dispatch({ type: actionType, payload: targetValueInt });
     } else if (targetValue === "") {
-      //Allow temporary empty value, while the user is editing
-      stateSetFn(targetValue);
+      // Allow temporary empty value, while the user is editing.
+      dispatch({ type: actionType, payload: targetValue });
     } else {
-      //Don't allow other values such as non positive numeric and non-emptry string to update the state
+      // Don't allow other values such as non positive numeric and non-empty string to update the state.
     }
   };
 
   const handleFilterStartAtChange = (e) => {
-    handleFilterLimitsCommonChange(e, setFilterStartAt);
+    handleFilterLimitsCommonChange(e, ACTIONS.SET_FILTER_START_AT);
   };
 
   const handleFilterLimitChange = (e) => {
-    handleFilterLimitsCommonChange(e, setFilterLimit);
+    handleFilterLimitsCommonChange(e, ACTIONS.SET_FILTER_LIMIT);
   };
 
   const handleFocusOnFilterStartAtElm = () => {
@@ -246,15 +316,20 @@ or start the caching server and reload the app!
   };
 
   useEffect(() => {
-    //Preselect month and year
+    // Preselect month and year
     const currentMonthIndex = getCurrentMonthIndex();
     const currentYear = getCurrentYear();
-    setSelectedMonth(months[currentMonthIndex + 1].value); // Set default month +1 because of the "ANY" entry at 0
-    setSelectedYear(
+    // Set default month +1 because of the "ANY" entry at 0
+    const monthValue = months[currentMonthIndex + 1].value;
+    const yearValue =
       years.find((y) => y.value === String(currentYear))?.value ||
-        years[0].value
-    );
-  }, []);
+      years[0].value;
+
+    dispatch({
+      type: ACTIONS.INITIALIZE_DATE_FILTERS,
+      payload: { month: monthValue, year: yearValue },
+    });
+  }, []); // Empty dependency array ensures this runs only once on mount.
 
   return (
     <div>
@@ -264,7 +339,12 @@ or start the caching server and reload the app!
             id="obsDisplayFilterByTextMatch"
             title="Search either for single text or multiple text matches using the || separator. For empty value match '' use the word 'empty' (makes most sense to be used with Notes/Folder)! Also use the word 'mismatch' to catch potential problems (such as title words not matching note/folder/summary)."
             value={filterByText}
-            onChange={(e) => setFilterByText(e.target.value)}
+            onChange={(e) =>
+              dispatch({
+                type: ACTIONS.SET_FILTER_BY_TEXT,
+                payload: e.target.value,
+              })
+            }
           >
             Filter by text:
           </CommonInput>
@@ -272,7 +352,12 @@ or start the caching server and reload the app!
             options={filterByTextTypeOptions}
             id="obsDisplayFilterByTextFor"
             value={filterByTextType}
-            onChange={(e) => setFilterByTextType(e.target.value)}
+            onChange={(e) =>
+              dispatch({
+                type: ACTIONS.SET_FILTER_BY_TEXT_TYPE,
+                payload: e.target.value,
+              })
+            }
           >
             (
             <span
@@ -293,7 +378,12 @@ or start the caching server and reload the app!
             options={telescopes}
             id="obsDisplayFilterByScope"
             value={selectedTelescope}
-            onChange={(e) => setSelectedTelescope(e.target.value)}
+            onChange={(e) =>
+              dispatch({
+                type: ACTIONS.SET_SELECTED_TELESCOPE,
+                payload: e.target.value,
+              })
+            }
           >
             Filter by Scope:{" "}
           </CommonSelect>
@@ -302,7 +392,12 @@ or start the caching server and reload the app!
             options={years}
             id="obsDisplayFilterByYear"
             value={selectedYear}
-            onChange={(e) => setSelectedYear(e.target.value)}
+            onChange={(e) =>
+              dispatch({
+                type: ACTIONS.SET_SELECTED_YEAR,
+                payload: e.target.value,
+              })
+            }
           >
             Filter by Year:{" "}
           </CommonSelect>
@@ -310,7 +405,12 @@ or start the caching server and reload the app!
             options={months}
             id="obsDisplayFilterByMonth"
             value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
+            onChange={(e) =>
+              dispatch({
+                type: ACTIONS.SET_SELECTED_MONTH,
+                payload: e.target.value,
+              })
+            }
           >
             Filter by Month:{" "}
           </CommonSelect>
@@ -318,7 +418,12 @@ or start the caching server and reload the app!
             options={daysOfTheWeek}
             id="obsDisplayFilterByDOW"
             value={selectedDayOfTheWeek}
-            onChange={(e) => setSelectedDayOfTheWeek(e.target.value)}
+            onChange={(e) =>
+              dispatch({
+                type: ACTIONS.SET_SELECTED_DAY_OF_THE_WEEK,
+                payload: e.target.value,
+              })
+            }
           >
             Filter by Day of the week:{" "}
           </CommonSelect>
@@ -326,7 +431,12 @@ or start the caching server and reload the app!
             options={filterSortByTextTypeOptions}
             id="obsDisplayFilterSortByTextType"
             value={filterSortByTextType}
-            onChange={(e) => setFilterSortByTextType(e.target.value)}
+            onChange={(e) =>
+              dispatch({
+                type: ACTIONS.SET_FILTER_SORT_BY_TEXT_TYPE,
+                payload: e.target.value,
+              })
+            }
           >
             Sort by{" "}
             <span
