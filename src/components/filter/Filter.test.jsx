@@ -25,62 +25,43 @@ describe("Filter Component", () => {
   const mockOnUpdateFilters = jest.fn();
   const mockOnShowLoading = jest.fn();
 
+  const renderComponent = (props = {}) => {
+    return render(
+      <Filter
+        data={mockData}
+        onUpdateFilters={mockOnUpdateFilters}
+        serverIsLive={true}
+        loading={false}
+        onShowLoading={mockOnShowLoading}
+        {...props}
+      />
+    );
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it("renders without crashing", () => {
-    render(
-      <Filter
-        data={mockData}
-        onUpdateFilters={mockOnUpdateFilters}
-        serverIsLive={true}
-        loading={false}
-        onShowLoading={mockOnShowLoading}
-      />
-    );
+    renderComponent();
   });
 
   it("updates filterByText state when input changes", () => {
-    render(
-      <Filter
-        data={mockData}
-        onUpdateFilters={mockOnUpdateFilters}
-        serverIsLive={true}
-        loading={false}
-        onShowLoading={mockOnShowLoading}
-      />
-    );
+    renderComponent();
     const inputElement = screen.getByLabelText("Filter by text:");
     fireEvent.change(inputElement, { target: { value: "test" } });
     expect(inputElement.value).toBe("test");
   });
 
   it("updates selectedMonth state when month select changes", () => {
-    render(
-      <Filter
-        data={mockData}
-        onUpdateFilters={mockOnUpdateFilters}
-        serverIsLive={true}
-        loading={false}
-        onShowLoading={mockOnShowLoading}
-      />
-    );
+    renderComponent();
     const selectElement = screen.getByLabelText("Filter by Month:");
     fireEvent.change(selectElement, { target: { value: months[1].value } }); // Select the second month
     expect(selectElement.value).toBe(months[1].value);
   });
 
   it("updates filterStartAt state when input changes", () => {
-    render(
-      <Filter
-        data={mockData}
-        onUpdateFilters={mockOnUpdateFilters}
-        serverIsLive={true}
-        loading={false}
-        onShowLoading={mockOnShowLoading}
-      />
-    );
+    renderComponent();
     const inputElement = screen.getByLabelText("Results start from:");
     fireEvent.change(inputElement, { target: { value: "5" } });
     expect(inputElement.value).toBe("5");
@@ -89,15 +70,7 @@ describe("Filter Component", () => {
   it("calls handleFilterFormSubmit when the form is submitted", () => {
     mockConsoleLog();
 
-    render(
-      <Filter
-        data={mockData}
-        onUpdateFilters={mockOnUpdateFilters}
-        serverIsLive={true}
-        loading={false}
-        onShowLoading={mockOnShowLoading}
-      />
-    );
+    renderComponent();
     const submitButton = screen.getByTitle(
       "Process Data based on Filters applied"
     );
@@ -107,15 +80,7 @@ describe("Filter Component", () => {
   });
 
   it("calls handleReset when the reset button is clicked", () => {
-    render(
-      <Filter
-        data={mockData}
-        onUpdateFilters={mockOnUpdateFilters}
-        serverIsLive={true}
-        loading={false}
-        onShowLoading={mockOnShowLoading}
-      />
-    );
+    renderComponent();
     const resetButton = screen.getByTitle(
       "Reset all filtering options (no preselected dates)"
     );
@@ -129,15 +94,7 @@ describe("Filter Component", () => {
 
     mockConsoleLog();
 
-    render(
-      <Filter
-        data={mockData}
-        onUpdateFilters={mockOnUpdateFilters}
-        serverIsLive={false}
-        loading={false}
-        onShowLoading={mockOnShowLoading}
-      />
-    );
+    renderComponent({ serverIsLive: false });
 
     const limitInput = screen.getByLabelText("Results limit:");
     fireEvent.change(limitInput, { target: { value: "101" } });
@@ -158,15 +115,7 @@ describe("Filter Component", () => {
 
     mockConsoleLog();
 
-    render(
-      <Filter
-        data={mockData}
-        onUpdateFilters={mockOnUpdateFilters}
-        serverIsLive={true}
-        loading={false}
-        onShowLoading={mockOnShowLoading}
-      />
-    );
+    renderComponent();
 
     const limitInput = screen.getByLabelText("Results limit:");
     fireEvent.change(limitInput, { target: { value: "101" } });

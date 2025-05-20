@@ -9,10 +9,19 @@ describe("CommonSelect Component", () => {
     { value: "option3", text: "Option 3" },
   ];
 
-  it("renders the label and select element", () => {
-    render(
-      <CommonSelect id="testSelect" children="Test Label" options={options} />
+  const renderComponent = (props = {}) => {
+    return render(
+      <CommonSelect
+        id="testSelect"
+        children="Test Label"
+        options={options}
+        {...props}
+      />
     );
+  };
+
+  it("renders the label and select element", () => {
+    renderComponent();
     expect(screen.getByText("Test Label")).toBeInTheDocument();
     expect(
       screen.getByRole("combobox", { id: "testSelect" })
@@ -20,18 +29,14 @@ describe("CommonSelect Component", () => {
   });
 
   it("renders the options correctly", () => {
-    render(
-      <CommonSelect id="testSelect" children="Test Label" options={options} />
-    );
+    renderComponent();
     options.forEach((option) => {
       expect(screen.getByText(option.text)).toBeInTheDocument();
     });
   });
 
   it("sets the correct values for options", () => {
-    render(
-      <CommonSelect id="testSelect" children="Test Label" options={options} />
-    );
+    renderComponent();
     const selectElement = screen.getByRole("combobox", { id: "testSelect" });
     const optionElements = screen.getAllByRole("option");
 
@@ -43,15 +48,11 @@ describe("CommonSelect Component", () => {
   });
 
   it("passes other props to the select element", () => {
-    render(
-      <CommonSelect
-        id="testSelect"
-        children="Test Label"
-        options={options}
-        className="custom-class"
-        data-testid="custom-testid"
-      />
-    );
+    renderComponent({
+      className: "custom-class",
+      "data-testid": "custom-testid",
+    });
+
     const selectElement = screen.getByRole("combobox", { id: "testSelect" });
     expect(selectElement.classList.contains("custom-class")).toBe(true);
     expect(selectElement).toHaveAttribute("data-testid", "custom-testid");

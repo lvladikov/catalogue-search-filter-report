@@ -16,21 +16,26 @@ const mockOnUpdateImageCache = jest.fn();
 const mockOnUpdateServerIsLive = jest.fn();
 
 describe("Upload Component", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it("renders the upload prompt when no file is selected", () => {
-    mockFetch(); //prevents the Cross origin http://localhost forbidden error
-    render(
+  const renderComponent = (props = {}) => {
+    return render(
       <Upload
         onUpdateData={mockOnUpdateData}
         onUpdateFileName={mockOnUpdateFileName}
         onUpdateImageCache={mockOnUpdateImageCache}
         onUpdateServerIsLive={mockOnUpdateServerIsLive}
         fileName={""}
+        {...props}
       />
     );
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("renders the upload prompt when no file is selected", () => {
+    mockFetch(); //prevents the Cross origin http://localhost forbidden error
+    renderComponent();
     expect(
       screen.getByText("Please upload your Observations Data source.")
     ).toBeInTheDocument();
@@ -41,15 +46,7 @@ describe("Upload Component", () => {
   it("does not render the upload prompt when a file is selected", () => {
     mockGetTime(123);
     mockFetch({ status: "ok", id: "123" });
-    render(
-      <Upload
-        onUpdateData={mockOnUpdateData}
-        onUpdateFileName={mockOnUpdateFileName}
-        onUpdateImageCache={mockOnUpdateImageCache}
-        onUpdateServerIsLive={mockOnUpdateServerIsLive}
-        fileName={"test.json"}
-      />
-    );
+    renderComponent({ fileName: "test.json" });
     expect(
       screen.queryByText("Please upload your Observations Data source.")
     ).not.toBeInTheDocument();
@@ -66,15 +63,7 @@ describe("Upload Component", () => {
       type: "application/json",
     });
 
-    render(
-      <Upload
-        onUpdateData={mockOnUpdateData}
-        onUpdateFileName={mockOnUpdateFileName}
-        onUpdateImageCache={mockOnUpdateImageCache}
-        onUpdateServerIsLive={mockOnUpdateServerIsLive}
-        fileName={""}
-      />
-    );
+    renderComponent();
 
     // eslint-disable-next-line testing-library/no-node-access
     const inputElement = document.querySelector('input[type="file"]');
@@ -95,15 +84,7 @@ describe("Upload Component", () => {
       type: "application/json",
     });
 
-    render(
-      <Upload
-        onUpdateData={mockOnUpdateData}
-        onUpdateFileName={mockOnUpdateFileName}
-        onUpdateImageCache={mockOnUpdateImageCache}
-        onUpdateServerIsLive={mockOnUpdateServerIsLive}
-        fileName={""}
-      />
-    );
+    renderComponent();
 
     // eslint-disable-next-line testing-library/no-node-access
     const inputElement = document.querySelector('input[type="file"]');
@@ -119,15 +100,7 @@ describe("Upload Component", () => {
     mockFetch({ status: "ok", id: "123" });
     mockFetch({ status: "ok", id: "123", cache: ["image1.jpg", "image2.jpg"] });
 
-    render(
-      <Upload
-        onUpdateData={mockOnUpdateData}
-        onUpdateFileName={mockOnUpdateFileName}
-        onUpdateImageCache={mockOnUpdateImageCache}
-        onUpdateServerIsLive={mockOnUpdateServerIsLive}
-        fileName={"test.json"}
-      />
-    );
+    renderComponent({ fileName: "test.json" });
 
     await waitFor(() => {
       expect(mockOnUpdateServerIsLive).toHaveBeenCalledWith(true);
@@ -141,15 +114,7 @@ describe("Upload Component", () => {
   it("handles server down scenario", async () => {
     mockFetch({ status: "error", id: "123" });
 
-    render(
-      <Upload
-        onUpdateData={mockOnUpdateData}
-        onUpdateFileName={mockOnUpdateFileName}
-        onUpdateImageCache={mockOnUpdateImageCache}
-        onUpdateServerIsLive={mockOnUpdateServerIsLive}
-        fileName={"test.json"}
-      />
-    );
+    renderComponent({ fileName: "test.json" });
 
     await waitFor(() => {
       expect(mockOnUpdateServerIsLive).toHaveBeenCalledWith(false);
@@ -160,15 +125,7 @@ describe("Upload Component", () => {
   it("handles image cache error scenario", async () => {
     mockFetch(new Error("Failed to fetch image cache"), true);
 
-    render(
-      <Upload
-        onUpdateData={mockOnUpdateData}
-        onUpdateFileName={mockOnUpdateFileName}
-        onUpdateImageCache={mockOnUpdateImageCache}
-        onUpdateServerIsLive={mockOnUpdateServerIsLive}
-        fileName={"test.json"}
-      />
-    );
+    renderComponent({ fileName: "test.json" });
 
     await waitFor(() => {
       expect(mockOnUpdateImageCache).toHaveBeenCalledWith([]);
