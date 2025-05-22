@@ -15,11 +15,6 @@ const {
 
 const { loadCache, PI_IMAGE_BASE_PATH } = require("./cache-images");
 
-//NOTE configure this folder to match where your data source JSON file would be
-//For security reasons the Client React app accessing this server can only pass the file name
-//but not the file path, so the below constant would be used as assumed path for the passed
-//dynamic file name in the /generate-pdf-report-trigger?id=[id]&fileName=[fileName] call
-const JSON_FILES_BASE_PATH = path.resolve(__dirname, "../data");
 const REPORT_OUT_FOLDER = path.resolve(__dirname, "../report");
 
 const MISSING_IMAGE_LOCAL = "missing_image.jpg";
@@ -32,8 +27,7 @@ const LOCAL_SERVER_CSS_URL = "http://localhost:3050/assets/report.css";
 
 const sortBy = "title"; // "title" | "note" | ..., title works best for the PDF Report
 
-const pupReport = async ({ id, fileName }) => {
-  const filePath = path.join(JSON_FILES_BASE_PATH, fileName);
+const pupReport = async ({ file }) => {
   const htmlOutFName = `${getFormattedTimestamp()}-report.html`;
   const htmlOutputFile = path.join(REPORT_OUT_FOLDER, htmlOutFName);
   const pdfOutFName = `${getFormattedTimestamp()}-report.pdf`;
@@ -54,7 +48,8 @@ const pupReport = async ({ id, fileName }) => {
     `
     );
 
-    const data = await fs.readFile(filePath, "utf8");
+    const data = file.buffer.toString();
+
     const jsonData = JSON.parse(data);
 
     // Transform the JSON data to array of objects

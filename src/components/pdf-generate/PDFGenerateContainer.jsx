@@ -15,7 +15,7 @@ const localPDFGenResetURL = "http://localhost:3050/generate-pdf-reset";
 
 const localPDFOutputURL = "http://localhost:3050/report/";
 
-export default function PDFGenerateContainer({ fileName }) {
+export default function PDFGenerateContainer({ file }) {
   const [workerData, setWorkerData] = useState({});
   const [workerStatus, setWorkerStatus] = useState("idle");
   const [pdfButtonDisabled, setPDFButtonDisabled] = useState(false);
@@ -50,17 +50,27 @@ export default function PDFGenerateContainer({ fileName }) {
   };
 
   const handlePDFReport = () => {
+    if (!file) return;
+
     setWorkerStatus("trigger");
     setPDFButtonDisabled(true);
 
     //Start tracking time
     setStartTime(Date.now());
 
+    //Prepare the uploaded file contents as FormData
+    const formData = new FormData();
+    formData.append("file", file);
+
+    //Append the id to the FormData
+    formData.append("id", pdfJobID.current);
+
     //no need to await this as it's a trigger and the web worker
     //would be checking the status via own API endpoint
-    fetch(
-      `${localPDFGenTriggerURL}?id=${pdfJobID.current}&fileName=${fileName}`
-    );
+    fetch(localPDFGenTriggerURL, {
+      method: "POST",
+      body: formData,
+    });
   };
 
   useEffect(() => {

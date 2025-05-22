@@ -1,6 +1,5 @@
 /* eslint-disable testing-library/no-wait-for-multiple-assertions */
 
-import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import Upload from "./Upload";
 
@@ -11,19 +10,35 @@ import {
 } from "../utils/test-helpers";
 
 const mockOnUpdateData = jest.fn();
-const mockOnUpdateFileName = jest.fn();
 const mockOnUpdateImageCache = jest.fn();
 const mockOnUpdateServerIsLive = jest.fn();
+const mockSetFile = jest.fn();
+
+const fileContent = {
+  observationsMeta: {
+    "image1.jpg": { somekey: "Value 1" },
+    "image2.jpg": { somekey: "Value 2" },
+  },
+};
+
+const fileContentResultArray = [
+  { imagePath: "image1.jpg", somekey: "Value 1" },
+  { imagePath: "image2.jpg", somekey: "Value 2" },
+];
+
+const mockFile = new File([JSON.stringify(fileContent)], "test.json", {
+  type: "application/json",
+});
 
 describe("Upload Component", () => {
   const renderComponent = (props = {}) => {
     return render(
       <Upload
         onUpdateData={mockOnUpdateData}
-        onUpdateFileName={mockOnUpdateFileName}
         onUpdateImageCache={mockOnUpdateImageCache}
         onUpdateServerIsLive={mockOnUpdateServerIsLive}
-        fileName={""}
+        file={null}
+        setFile={mockSetFile}
         {...props}
       />
     );
@@ -31,6 +46,7 @@ describe("Upload Component", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    global.fetch = jest.fn();
   });
 
   it("renders the upload prompt when no file is selected", () => {
@@ -46,41 +62,46 @@ describe("Upload Component", () => {
   it("does not render the upload prompt when a file is selected", () => {
     mockGetTime(123);
     mockFetch({ status: "ok", id: "123" });
-    renderComponent({ fileName: "test.json" });
+    renderComponent({ file: mockFile });
     expect(
       screen.queryByText("Please upload your Observations Data source.")
     ).not.toBeInTheDocument();
   });
 
-  it("calls onUpdateFileName and onUpdateData when a file is uploaded", async () => {
-    const fileContent = {
-      observationsMeta: {
-        "image1.jpg": { somekey: "Value 1" },
-        "image2.jpg": { somekey: "Value 2" },
-      },
-    };
-    const file = new File([JSON.stringify(fileContent)], "test.json", {
-      type: "application/json",
-    });
-
+  it("calls setFile when a file is selected", async () => {
     renderComponent();
 
     // eslint-disable-next-line testing-library/no-node-access
     const inputElement = document.querySelector('input[type="file"]');
-    fireEvent.change(inputElement, { target: { files: [file] } });
+
+    fireEvent.change(inputElement, {
+      target: { files: [mockFile] },
+    });
 
     await waitFor(() => {
-      expect(mockOnUpdateFileName).toHaveBeenCalledWith("test.json");
-      expect(mockOnUpdateData).toHaveBeenCalledWith([
-        { imagePath: "image1.jpg", somekey: "Value 1" },
-        { imagePath: "image2.jpg", somekey: "Value 2" },
-      ]);
+      expect(mockSetFile).toHaveBeenCalledWith(mockFile);
+    });
+  });
+
+  it("calls mockSetFile and onUpdateData when a file is uploaded", async () => {
+    renderComponent();
+
+    // eslint-disable-next-line testing-library/no-node-access
+    const inputElement = document.querySelector('input[type="file"]');
+    fireEvent.change(inputElement, {
+      target: { files: [mockFile] },
+    });
+
+    await waitFor(() => {
+      expect(mockSetFile).toHaveBeenCalledWith(mockFile);
+      expect(mockOnUpdateData).toHaveBeenCalledWith(fileContentResultArray);
     });
   });
 
   it("calls onUpdateData with an empty array when an invalid JSON file is uploaded", async () => {
     mockConsoleError(() => "expected error, don't break or log");
-    const file = new File(["invalid json"], "test.json", {
+    const fileContent = "invalid json";
+    const mockFile = new File([fileContent], "test.json", {
       type: "application/json",
     });
 
@@ -88,33 +109,38 @@ describe("Upload Component", () => {
 
     // eslint-disable-next-line testing-library/no-node-access
     const inputElement = document.querySelector('input[type="file"]');
-    fireEvent.change(inputElement, { target: { files: [file] } });
+    fireEvent.change(inputElement, {
+      target: { files: [mockFile] },
+    });
 
     await waitFor(() => {
       expect(mockOnUpdateData).toHaveBeenCalledWith([]);
     });
   });
 
-  it("fetches data and updates state when fileName changes", async () => {
+  it("fetches server status and updates state when file changes", async () => {
     mockGetTime(123);
     mockFetch({ status: "ok", id: "123" });
-    mockFetch({ status: "ok", id: "123", cache: ["image1.jpg", "image2.jpg"] });
+    mockFetch({
+      status: "ok",
+      id: "123",
+      cache: fileContentResultArray.map((i) => i.imagePath),
+    });
 
-    renderComponent({ fileName: "test.json" });
+    renderComponent({ file: mockFile });
 
     await waitFor(() => {
       expect(mockOnUpdateServerIsLive).toHaveBeenCalledWith(true);
-      expect(mockOnUpdateImageCache).toHaveBeenCalledWith([
-        "image1.jpg",
-        "image2.jpg",
-      ]);
+      expect(mockOnUpdateImageCache).toHaveBeenCalledWith(
+        fileContentResultArray.map((i) => i.imagePath)
+      );
     });
   });
 
   it("handles server down scenario", async () => {
     mockFetch({ status: "error", id: "123" });
 
-    renderComponent({ fileName: "test.json" });
+    renderComponent({ file: mockFile });
 
     await waitFor(() => {
       expect(mockOnUpdateServerIsLive).toHaveBeenCalledWith(false);
@@ -122,10 +148,10 @@ describe("Upload Component", () => {
     });
   });
 
-  it("handles image cache error scenario", async () => {
+  it("handles image cache fetch error", async () => {
     mockFetch(new Error("Failed to fetch image cache"), true);
 
-    renderComponent({ fileName: "test.json" });
+    renderComponent({ file: mockFile });
 
     await waitFor(() => {
       expect(mockOnUpdateImageCache).toHaveBeenCalledWith([]);

@@ -13,7 +13,7 @@ const LOCAL_SERVER_CACHED_IMAGES_URL = "http://localhost:3050/images/";
 
 export default function Results({
   results,
-  fileName,
+  file,
   imageCache,
   serverIsLive,
   loading,
@@ -85,7 +85,7 @@ export default function Results({
     <>
       {serverIsLive && (
         /* Only Allow PDF Reports when Local Server is available, because we need to beneft from the cached images */
-        <PDFGenerateContainer fileName={fileName} />
+        <PDFGenerateContainer file={file} />
       )}
 
       <div className="observation-display-containers-wrapper">

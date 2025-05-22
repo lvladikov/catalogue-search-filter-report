@@ -7,13 +7,17 @@ const LOCAL_SERVER_UPDATE_IMAGE_CACHE_URL =
 
 export default function Upload({
   onUpdateData,
-  onUpdateFileName,
   onUpdateImageCache,
   onUpdateServerIsLive,
-  fileName,
+  file,
+  setFile,
 }) {
   useEffect(() => {
-    if (fileName !== "") {
+    if (file) {
+      //Prepare the uploaded file contents as FormData
+      const formData = new FormData();
+      formData.append("file", file);
+
       const fetchData = async () => {
         try {
           //High level server quick availability check, which would be tracked in the app
@@ -40,7 +44,11 @@ export default function Upload({
 
           // Run the cache images server process once the file has been selected
           const imageCacheResponse = await fetch(
-            `${LOCAL_SERVER_UPDATE_IMAGE_CACHE_URL}?fileName=${fileName}`
+            LOCAL_SERVER_UPDATE_IMAGE_CACHE_URL,
+            {
+              method: "POST",
+              body: formData,
+            }
           );
 
           const imageCache = await imageCacheResponse.json();
@@ -58,14 +66,13 @@ export default function Upload({
 
     return () => {};
     // eslint-disable-next-line
-  }, [fileName]);
+  }, [file]);
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0]; // Get the selected file
     if (!file) return;
 
-    const fileName = file.name;
-    onUpdateFileName(fileName);
+    setFile(file);
 
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -86,7 +93,7 @@ export default function Upload({
     reader.readAsText(file); // Read file content as text
   };
 
-  if (fileName !== "") return;
+  if (file) return; //Only show File Upload if no file state yet
 
   return (
     <div className="upload-json-wrapper">

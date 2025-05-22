@@ -4,6 +4,7 @@
     "chalk": "^4.1.2",
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "multer": "^2.0.0",
     "puppeteer": "^24.8.0"
   },
   "scripts": {

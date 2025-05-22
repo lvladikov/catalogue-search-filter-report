@@ -10,7 +10,7 @@ export default function App() {
   const [serverIsLive, setServerIsLive] = useState(false);
   const [data, setData] = useState(null);
   const [imageCache, setImageCache] = useState(null);
-  const [fileName, setFileName] = useState("");
+  const [file, setFile] = useState(null);
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -19,10 +19,10 @@ export default function App() {
       {!data && (
         <Upload
           onUpdateData={setData}
-          onUpdateFileName={setFileName}
           onUpdateImageCache={setImageCache}
           onUpdateServerIsLive={setServerIsLive}
-          fileName={fileName}
+          file={file}
+          setFile={setFile}
         />
       )}
       {data && (
@@ -38,7 +38,7 @@ export default function App() {
       {results && (
         <Results
           results={results}
-          fileName={fileName}
+          file={file}
           serverIsLive={serverIsLive}
           imageCache={imageCache}
           loading={loading}

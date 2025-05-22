@@ -5,7 +5,6 @@ const axios = require("axios");
 
 const CACHE_FILE = "image-cache.json";
 const IMAGE_CACHE_FOLDER = path.resolve(__dirname, "../image-cache");
-const JSON_FILES_BASE_PATH = path.resolve(__dirname, "../data");
 const PI_IMAGE_BASE_PATH = "https://i.postimg.cc/";
 const MISSING_IMAGE_LOCAL = "missing_image.jpg";
 
@@ -107,10 +106,7 @@ const processImages = async (imageUrls) => {
   };
 };
 
-const cacheImages = async (fileName) => {
-  const filePath = path.join(JSON_FILES_BASE_PATH, fileName);
-
-  const data = await fs.promises.readFile(filePath, "utf8");
+const cacheImages = async (data) => {
   const jsonData = JSON.parse(data);
 
   //Get a list of all imageURLs from the passed in JSON data file
